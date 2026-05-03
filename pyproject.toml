@@ -7,13 +7,9 @@ requires-python = ">=3.13"
 dependencies = [
     # environment dependencies
     "python-dotenv>=1.1.1",
-
     # API  dependencies
     "line-bot-sdk>=3.4.0",
-    "fastapi>=0.100.0",
-    "uvicorn>=0.23.2",
-
-
+    "fastapi[standard]",
     # ML dependencies
     "datasets>=4.8.5",
     "nltk>=3.9.4",
@@ -26,5 +22,6 @@ dependencies = [
     "torchaudio>=2.11.0",
     "torchvision>=0.26.0",
     "transformers>=5.7.0",
-    
 ]
+
+
