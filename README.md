@@ -1,2 +1,6 @@
-# UTCC-Hackathon
-UTCC-hackthon competition is about Developing AI Model to improve Personal/National Security 
+# ScamRadar-Security-AI-Detector with Line ChatBot
+---
+
+
+
+
