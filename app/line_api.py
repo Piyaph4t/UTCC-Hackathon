@@ -14,26 +14,51 @@ from linebot.v3.messaging import (
     ReplyMessageRequest,
     TextMessage,
 )
-from linebot.v3.webhooks import MessageEvent, TextMessageContent
+from linebot.v3.webhooks import (
+    MessageEvent,
+    TextMessageContent,
+    FileMessageContent,
+    ImageMessageContent,
+    AudioMessageContent,
+    VideoMessageContent
+)
 
 
 from dotenv import load_dotenv
+import json
 import os
+import asyncio
+import logging
+from scanners.file_scanner import scan_file
 
 load_dotenv()
 configuration = Configuration(access_token=os.getenv("LINE_ACCESS_TOKEN"))
 handler = WebhookHandler(channel_secret=os.getenv("LINE_CHANNEL_SECRET"))
+logger = logging.getLogger(__name__)
 
 
 # ==== Line Webhook =====
-@handler.add(MessageEvent, message=TextMessageContent)
-def handle_message(event):
+
+async def download_message_content(message_id: str) -> bytes:
+    """Downloads the binary content of a message from LINE API."""
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
-        test_reply_massage = "Hello from Fast/Line API"
-        line_bot_api.reply_message_with_http_info(
-            ReplyMessageRequest(
-                reply_token=event.reply_token,
-                messages=[TextMessage(text=test_reply_massage)],
-            )
-        )
+        content = line_bot_api.get_message_content(message_id)
+        return content.read()
+
+@handler.add(MessageEvent)
+async def handle_message(event):
+    # Log the event
+    event_data = str(dict(event))
+    with open("Meassage.log", "a") as log:
+        log.write(event_data + "\n")
+
+        # Check if message is a file/media
+    if isinstance(event.message, (FileMessageContent, ImageMessageContent, AudioMessageContent, VideoMessageContent)):
+        try:
+            # 1. Download content
+            content = await download_message_content(event.message.id)
+
+
+        except Exception as e:
+            logger.error(f"Error processing file scan: {e}")
